@@ -4,9 +4,24 @@ const BETA_LIST = "Beta"
 function onOpen() {
   var ui = SpreadsheetApp.getUi();
   ui.createMenu('GSOC: Utilities')
-      // .addItem('Move Completed Tasks', 'moveCompletedTasks')
+      .addItem('Move Completed Tasks', 'moveCompletedTasksv2')
       .addToUi();
 }
+
+function sortColumnF(sheet) {
+  // Find the last row with data in column F (assuming column F is the column to sort)
+  var lastRow = sheet.getLastRow();
+  
+  if (lastRow < 4) {
+    Logger.log("No data to sort below row 3.");
+    return;
+  }
+  
+  var rangeToSort = sheet.getRange(3, 1, lastRow - 3, sheet.getLastColumn()); // Assuming you want to sort all columns
+  rangeToSort.sort({column: 6, ascending: true}); // Sort by column F (index 6)
+}
+
+
 
 function moveCompletedTasks2() {
   var sourceSheetName = BETA_LIST; // Replace with the name of your source sheet
@@ -153,7 +168,7 @@ function moveCompletedTasksv1() {
 
 function moveCompletedTasksv2() {
   logFunctionStart();
-  var sourceSheetName = "BETA"; // Replace with the name of your source sheet
+  var sourceSheetName = TASK_SHEET_NAME; // Replace with the name of your source sheet
   var targetSheetName = "Completed Tasks"; // Replace with the name of your target sheet
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sourceSheet = ss.getSheetByName(sourceSheetName);
@@ -201,6 +216,7 @@ function moveCompletedTasksv2() {
 
   deleteFailsafeCopySheet();
   setRowHeightTo98(sourceSheet);
+  sortColumnF(sourceSheet)
   insertIncreasingNumbers(sourceSheet);
   logFunctionEnd(count, action);
 }
@@ -369,12 +385,10 @@ function betaMain(){
   var ss = SpreadsheetApp.getActiveSpreadsheet();
 
   // Get the sheet by name
-  var sheet = ss.getSheetByName(sheetName);
+  // var sheet = ss.getSheetByName(sheetName);
   var betaSheet = ss.getSheetByName(betaSheet);
 
-  data = getTasksListData(betaSheet)
-  taskData = readTasksList(data)
-  clearCellsFromRow3Down(betaSheet)
+  sortColumnF(betaSheet)
 
-  console.log(taskData)
+  // console.log(taskData)
 }
